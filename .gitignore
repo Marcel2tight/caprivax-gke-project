@@ -1,0 +1,30 @@
+# --- Terraform ---
+# Ignore all .terraform folders in any subdirectory
+**/.terraform/
+
+# Ignore all state files (they contain secrets!)
+**/*.tfstate
+**/*.tfstate.*
+
+# Ignore crash logs
+**/crash.log
+
+# Ignore variables (if you have local .tfvars)
+**/*.tfvars
+**/*.tfvars.json
+
+# --- Kubernetes ---
+# Ignore local kubeconfig files
+**/kubeconfig
+
+# --- System & IDE ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Binaries & Large Files ---
+# This prevents the "Filename too long" error for .exe provider files
+**/*.exe
+**/*.dll
+**/*.so
