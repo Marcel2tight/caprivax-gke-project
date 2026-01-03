@@ -1,28 +1,67 @@
-Caprivax GKE Modernization Project 
-🚀A production-grade implementation of a Google Kubernetes Engine (GKE) cluster using Infrastructure as Code (Terraform), featuring a full-stack observability suite (Prometheus/Grafana) and automated Slack alerting.🎯 Project OverviewThis project demonstrates the transition from manual cloud configuration to a mature GitOps and IaC workflow. It provides a secure, scalable, and fully monitored environment for containerized microservices.Key FeaturesInfrastructure as Code: Modular Terraform configuration with a GCS Remote Backend.High Availability: 3-node regional cluster with managed node pools.Security: Implementation of Workload Identity and granular RBAC (Principle of Least Privilege).Observability: Full-stack monitoring using Helm, Prometheus, and Grafana.Validation: Proactive stress-testing to verify alerting thresholds.
+# Caprivax GKE Modernization Platform ☸️
+### Enterprise Kubernetes Orchestration with GitOps & Granular RBAC Security
 
-🏗️ Project StructurePlaintextcaprivax-gke-project/
-├── terraform/                  # Infrastructure as Code
-│   ├── main.tf                 # GKE Cluster & Node Pool
-│   ├── variables.tf            # Input Variables
-│   ├── outputs.tf              # Connection Outputs
-├── kubernetes/                 # K8s Manifests
-│   ├── app-deployment.yaml     # Application & LoadBalancer
-│   ├── prometheus-rbac.yaml    # RBAC Fix for Monitoring
-│   ├── stress-test.yaml        # Alert Testing Pod
-├── screenshots/                # Evidence of Work
-│   ├── grafana-dashboard.png
-│   └── slack-alert.png
-└── README.md
+![Kubernetes](https://img.shields.io/badge/kubernetes-%23326ce5.svg?style=for-the-badge&logo=kubernetes&logoColor=white)
+![Terraform](https://img.shields.io/badge/terraform-%235835CC.svg?style=for-the-badge&logo=terraform&logoColor=white)
+![Helm](https://img.shields.io/badge/helm-%230F1628.svg?style=for-the-badge&logo=helm&logoColor=white)
+![GCP](https://img.shields.io/badge/GoogleCloud-%234285F4.svg?style=for-the-badge&logo=google-cloud&logoColor=white)
 
-🛠️ Technical Execution1. Provisioning InfrastructureThe infrastructure is defined in Terraform, utilizing a remote state backend in Google Cloud Storage to allow for team collaboration and state locking.Bashcd terraform
+## 📌 Project Overview
+A production-grade implementation of a **Google Kubernetes Engine (GKE)** cluster and Automated CI/CD Platform. This project demonstrates a mature GitOps workflow, providing a secure, scalable, and fully monitored environment for enterprise microservices using the **Principle of Least Privilege**.
+
+
+
+### 🌟 Architectural Design
+* **Infrastructure as Code:** Modular Terraform configuration with **GCS Remote Backend** for state locking and environment parity.
+* **Hardened Security:** Implementation of **Workload Identity**, **IAP Tunneling**, and granular **K8s RBAC**.
+* **GitOps Orchestration:** Jenkins-as-Code (Groovy DSL) managing multi-stage deployment pipelines.
+* **Observability:** Full-stack monitoring via **Prometheus & Grafana** with integrated Slack Alerting.
+
+---
+
+## 📂 Project Structure
+```text
+caprivax-gke-project/
+├── terraform/                # Modular GKE, VPC, and Node Pool definitions
+├── kubernetes/               # Manifests for Workloads, Services, and RBAC
+├── screenshots/              # Visual proof of Monitoring & Cluster Health
+└── terraform-pipelines/      # Groovy DSL Jenkinsfiles for GitOps automation
+
+🛠️ Operational Metrics Baseline
+Monitoring is not just about charts; it's about knowing when to act. This project uses the following SRE baselines:
+
+Metric            Normal Range        Critical Threshold      Action Plan
+Node CPU          10-60%              >90%                    Trigger Horizontal Cluster Autoscaler
+Pod Throttling    <1%                  >20%                    Increase Resource CPU Limits
+Memory Usage      20-70%               >90%                    Investigate Memory Leaks / OOMKills
+
+🚀 Technical Execution
+
+1.Provisioning Infrastructure
+Bash
+cd terraform
 terraform init
 terraform apply -auto-approve
 
-2. Cluster Security (Workload Identity)I implemented Workload Identity to eliminate the need for static Service Account JSON keys. This maps Kubernetes Service Accounts (KSA) directly to Google IAM roles.
-3. Observability & TroubleshootingThe monitoring stack was deployed via Helm. A critical challenge involved a 403 Forbidden error during metrics scraping, which I resolved by authoring a granular RBAC ClusterRole to grant Prometheus the necessary permissions without using cluster-admin.
-Accessing the Dashboard:Retrieve the admin password:Bashkubectl get secret --namespace monitoring monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
-Port-forward the service:Bashkubectl port-forward svc/monitoring-grafana -n monitoring 3000:80
+2. Observability & RBAC Troubleshooting
+During deployment, I resolved a critical 403 Forbidden scraping error. Instead of granting cluster-admin (insecure), I authored a granular ClusterRole to grant Prometheus exactly the permissions needed to scrape metrics.
 
-📊 Operational Metrics BaselineI established a performance baseline to ensure the cluster operates within healthy parameters.MetricNormalCriticalActionNode CPU10-60%> 90%Scale Node PoolPod Throttling< 1%> 20%Increase CPU LimitsMemory Usage20-70%> 90%Check for Memory Leaks⚠️ 
-Technical Challenges Overcome🛡️ The RBAC FixProblem: Prometheus metrics were empty due to permission errors.Solution: Created a dedicated ServiceAccount and scoped ClusterRoleBinding to allow scraping while maintaining the Principle of Least Privilege.🐙 Git History ScrubbingProblem: Push rejected due to 100MB+ Terraform binaries in history.Solution: Optimized the .gitignore and performed a targeted repository isolation to strip bloated binary history, resulting in a lightweight, clean GitOps workflow.🧹 CleanupTo avoid unnecessary GCP costs, the infrastructure is managed by a full lifecycle.Bashterraform destroy -auto-approve
+Accessing Grafana:
+Bash
+# Retrieve the auto-generated admin password
+kubectl get secret --namespace monitoring monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+# Port-forward the dashboard
+kubectl port-forward svc/monitoring-grafana -n monitoring 3000:80
+
+🔒 Security Posture & RBAC Fix
+The RBAC Fix: Scoped a dedicated ServiceAccount and ClusterRoleBinding 
+to allow metrics scraping while maintaining the Principle of Least Privilege.
+
+Workload Identity: Eliminated the need for static service account keys by mapping K8s ServiceAccounts to GCP IAM roles.
+
+👤 Author
+Marcel Owhonda - Cloud & DevOps Engineer
+- GitHub: [@Marcel2tight](https://github.com/Marcel2tight)
+- LinkedIn: [Marcel Owhonda](https://www.linkedin.com/in/marcel-owhonda-devops)
+Built to demonstrate mastery in Kubernetes modernization and cloud-native security.
